@@ -1,0 +1,179 @@
+<div class="app-shell">
+  <header class="topbar">
+    <button class="brand" type="button" (click)="clearAnalysis()" aria-label="Reiniciar análise">
+      <span class="brand-mark">AF</span>
+      <span>Analisador de Frequência</span>
+    </button>
+    <span class="privacy-note"><span aria-hidden="true">●</span> Processamento 100% local</span>
+  </header>
+
+  <main>
+    <section class="hero" [class.hero--with-results]="result()" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <span class="eyebrow">PESQUISA QUALITATIVA</span>
+        <h1 id="page-title">Encontre os temas que mais importam no seu texto.</h1>
+        <p>
+          Importe um arquivo e descubra, em segundos, as palavras mais recorrentes — sem enviar
+          nenhum conteúdo para a internet.
+        </p>
+        <mat-chip-set aria-label="Recursos da análise">
+          <mat-chip>Normalização automática</mat-chip>
+          <mat-chip>Stopwords em português</mat-chip>
+          <mat-chip>Ranking das 10 palavras</mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <mat-card class="upload-card" appearance="outlined">
+        <mat-card-content>
+          <div class="step-label"><span>1</span> Importe o documento</div>
+
+          <input
+            #fileInput
+            class="visually-hidden"
+            type="file"
+            accept=".txt,text/plain"
+            (change)="onFileSelected($event)"
+            aria-label="Selecionar arquivo de texto"
+          />
+
+          <div
+            class="drop-zone"
+            [class.drop-zone--active]="isDragging()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+          >
+            @if (isReading()) {
+              <mat-spinner diameter="48" aria-label="Lendo documento"></mat-spinner>
+              <h2>Lendo o documento…</h2>
+              <p>A análise será exibida em instantes.</p>
+            } @else if (result()) {
+              <div class="file-symbol file-symbol--success" aria-hidden="true">✓</div>
+              <span class="ready-label">ANÁLISE CONCLUÍDA</span>
+              <h2 class="file-name">{{ fileName() }}</h2>
+              <p>{{ fileSize() }} · arquivo de texto</p>
+              <div class="file-actions">
+                <button mat-flat-button type="button" (click)="fileInput.click()">
+                  Trocar arquivo
+                </button>
+                <button mat-button type="button" (click)="clearAnalysis()">Remover</button>
+              </div>
+            } @else {
+              <div class="file-symbol" aria-hidden="true">TXT</div>
+              <h2>Arraste ou selecione seu arquivo</h2>
+              <p>Formato .txt · até 15 MB</p>
+              <button mat-flat-button type="button" (click)="fileInput.click()">
+                Escolher arquivo
+              </button>
+            }
+          </div>
+
+          @if (errorMessage()) {
+            <div class="error-message" role="alert">
+              <span aria-hidden="true">!</span>
+              {{ errorMessage() }}
+            </div>
+          } @else {
+            <p class="security-copy">
+              Seu documento é analisado somente neste dispositivo e não fica armazenado.
+            </p>
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    @if (result(); as analysis) {
+      <section #reportSection class="report" aria-labelledby="report-title" aria-live="polite">
+        <div class="report-heading">
+          <div>
+            <span class="eyebrow">RELATÓRIO DA ANÁLISE</span>
+            <h2 id="report-title">As palavras que dão forma ao documento</h2>
+          </div>
+          <span class="report-file" title="{{ fileName() }}">{{ fileName() }}</span>
+        </div>
+
+        <div class="summary-grid" aria-label="Resumo da análise">
+          <mat-card appearance="outlined">
+            <span>Total identificado</span>
+            <strong>{{ analysis.totalWords.toLocaleString('pt-BR') }}</strong>
+            <small>palavras no documento</small>
+          </mat-card>
+          <mat-card appearance="outlined">
+            <span>Termos relevantes</span>
+            <strong>{{ analysis.relevantWords.toLocaleString('pt-BR') }}</strong>
+            <small>após a filtragem</small>
+          </mat-card>
+          <mat-card appearance="outlined">
+            <span>Vocabulário</span>
+            <strong>{{ analysis.uniqueWords.toLocaleString('pt-BR') }}</strong>
+            <small>palavras diferentes</small>
+          </mat-card>
+          <mat-card appearance="outlined">
+            <span>Conectivos removidos</span>
+            <strong>{{ analysis.ignoredWords.toLocaleString('pt-BR') }}</strong>
+            <small>stopwords ignoradas</small>
+          </mat-card>
+        </div>
+
+        @if (analysis.ranking.length) {
+          <mat-card class="ranking-card" appearance="outlined">
+            <div class="ranking-header">
+              <div>
+                <span class="step-label"><span>2</span> Explore os resultados</span>
+                <h3>10 palavras mais frequentes</h3>
+              </div>
+              <span class="ranking-note">Ordenadas por ocorrências</span>
+            </div>
+
+            <ol class="ranking-list">
+              @for (item of analysis.ranking; track item.word; let position = $index) {
+                <li>
+                  <span class="position">{{ position + 1 }}º</span>
+                  <div class="word-data">
+                    <div class="word-line">
+                      <strong>{{ item.word }}</strong>
+                      <span>{{ formatCount(item.count) }}</span>
+                    </div>
+                    <div class="frequency-track" aria-hidden="true">
+                      <span [style.width.%]="item.percentageOfLeader"></span>
+                    </div>
+                  </div>
+                </li>
+              }
+            </ol>
+          </mat-card>
+        }
+      </section>
+    }
+
+    <section class="method" aria-labelledby="method-title">
+      <div>
+        <span class="eyebrow">COMO FUNCIONA</span>
+        <h2 id="method-title">Uma leitura objetiva, transparente e reproduzível.</h2>
+      </div>
+      <ol>
+        <li>
+          <span>01</span><strong>Normaliza</strong
+          ><small>Converte todo o conteúdo para minúsculas.</small>
+        </li>
+        <li>
+          <span>02</span><strong>Higieniza</strong
+          ><small>Remove números, pontuação e símbolos.</small>
+        </li>
+        <li>
+          <span>03</span><strong>Filtra</strong
+          ><small>Descarta conectivos comuns do português.</small>
+        </li>
+        <li>
+          <span>04</span><strong>Classifica</strong
+          ><small>Ordena os termos pela frequência observada.</small>
+        </li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <span>Analisador de Frequência de Palavras</span>
+    <span>Feito para apoiar pesquisas qualitativas.</span>
+  </footer>
+</div>

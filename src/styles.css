@@ -1,0 +1,49 @@
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+:root {
+  --app-font: 'Google Sans Flex', 'Google Sans', ui-sans-serif, system-ui, sans-serif;
+  --mat-sys-body-large-font: var(--app-font);
+  --mat-sys-body-medium-font: var(--app-font);
+  --mat-sys-body-small-font: var(--app-font);
+  --mat-sys-display-large-font: var(--app-font);
+  --mat-sys-display-medium-font: var(--app-font);
+  --mat-sys-display-small-font: var(--app-font);
+  --mat-sys-headline-large-font: var(--app-font);
+  --mat-sys-headline-medium-font: var(--app-font);
+  --mat-sys-headline-small-font: var(--app-font);
+  --mat-sys-label-large-font: var(--app-font);
+  --mat-sys-label-medium-font: var(--app-font);
+  --mat-sys-label-small-font: var(--app-font);
+  --mat-sys-title-large-font: var(--app-font);
+  --mat-sys-title-medium-font: var(--app-font);
+  --mat-sys-title-small-font: var(--app-font);
+  font-family: var(--app-font);
+  font-optical-sizing: auto;
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #f7f5ef;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+*:focus-visible {
+  outline: 3px solid rgba(192, 99, 47, 0.38);
+  outline-offset: 3px;
+}
